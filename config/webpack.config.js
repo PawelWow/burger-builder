@@ -62,7 +62,7 @@ module.exports = function(webpackEnv) {
   // Webpack uses `publicPath` to determine where the app is being served from.
   // It requires a trailing slash, or the file assets will get an incorrect path.
   // In development, we always serve from the root. This makes config easier.
-  const publicPath = isEnvProductionf
+  const publicPath = isEnvProduction
     ? paths.servedPath
     : isEnvDevelopment && '/';
   // Some apps do not use client-side routing with pushState.
@@ -438,8 +438,7 @@ module.exports = function(webpackEnv) {
               use: getStyleLoaders({
                 importLoaders: 1,
                 sourceMap: isEnvProduction && shouldUseSourceMap,
-                modules: true,
-                localIdentName: '[name]__[local]__[hash:base64:5]'
+                modules: { localIdentName: '[name]__[local]__[hash:base64:5]' }
               }),
               // Don't consider CSS imports dead code even if the
               // containing package claims to have no side effects.
