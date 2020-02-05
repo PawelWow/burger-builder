@@ -7,6 +7,8 @@ import Modal from '../../components/UI/Modal/Modal';
 import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import Spinner from '../../components/UI/Spinner/Spinner';
 
+import axios from '../../axios-orders';
+
 const INGREDIENT_PRICES = {
     salad: 0.5,
     cheese: 0.4,
@@ -106,6 +108,14 @@ class BurgerBuilder extends Component {
         }
 
         // axios todo - post here!
+        // w firebase musimy ustawić reguły dla real time database
+        // axios.post('/orders.json', order).then(response => { 
+        //     this.setState({loading: false, purchasing: false})})
+        //     .catch(error => {
+        //         console.log(error);
+        //         this.setState({loading: false, purchasing: false})
+        // });
+        
     }
 
     render() {
