@@ -25,16 +25,21 @@ class BurgerBuilder extends Component {
     // }
 
     state = {
-        ingredients: {
-            salad: 0,
-            bacon: 0,
-            cheese: 0,
-            meat: 0
-        },
+        ingredients: null,
         totalPrice: 4,
         purchasable: false,
         purchasing: false,
-        loading: false
+        loading: false,
+        error: false
+    }
+
+    componentDidMount(){
+        axios.get('/ingredients.json').then(response => {
+            this.setState({ingredients: response.data});
+        })
+        .catch(error => {
+            this.setState( {error: true});
+        });
     }
 
     updatePurchaseState(ingredients) {
@@ -119,7 +124,49 @@ class BurgerBuilder extends Component {
             
     };
 
-    render() {
+    render() { 
+        return (
+            <Aux>
+                <Modal show={this.state.purchasing} modalClosed={this.onPurchaseCancel}>
+                    {this.getOrderInformation()}
+                </Modal>
+                {this.getBurgerSection()}
+            </Aux>
+        );
+    }
+
+    // wyświetla informacje związane z zamówieniem
+    getOrderInformation(){
+        if ( this.state.loading) {
+            return <Spinner />
+        }
+
+        if(!this.state.ingredients){
+            // nie ma składników - nie ma podsumowania.
+            return null;
+        }
+
+        // summary
+        return <OrderSummary 
+            ingredients={this.state.ingredients} 
+            purchaseCancelled={this.onPurchaseCancel} 
+            purchaseContinued={this.onPurchaseContinue} 
+            price={this.state.totalPrice}
+            />        
+    }
+
+    // wyświetla sekcję z burgerem
+    getBurgerSection(){
+        if(this.state.error){
+            return <p>Ingredients could'n be loaded!</p>
+        }
+
+        if(!this.state.ingredients){
+            // jeszcze nie mamy składników
+            return <Spinner />
+        }
+
+        // tutaj mamy składniki - wszystko ok, budujemy burgera...
 
         // to jest masakra: miałem liczby
         const disabledInfo = {
@@ -133,9 +180,6 @@ class BurgerBuilder extends Component {
 
         return (
             <Aux>
-                <Modal show={this.state.purchasing} modalClosed={this.onPurchaseCancel}>
-                    {this.getOrderInformation()}
-                </Modal>
                 <Burger ingredients={this.state.ingredients} />
                 <BuildControls
                     ingredientAdded={this.onAddIngredient}
@@ -147,21 +191,6 @@ class BurgerBuilder extends Component {
                 />
             </Aux>
         );
-    }
-
-    // wyświetla informacje związane z zamówieniem
-    getOrderInformation(){
-        if ( this.state.loading) {
-            return <Spinner />
-        }
-
-        // summary
-        return <OrderSummary 
-            ingredients={this.state.ingredients} 
-            purchaseCancelled={this.onPurchaseCancel} 
-            purchaseContinued={this.onPurchaseContinue} 
-            price={this.state.totalPrice}
-            />        
     }
 }
 
