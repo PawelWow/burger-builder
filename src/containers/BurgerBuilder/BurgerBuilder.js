@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 
 import Aux from '../../hoc/Auxiliary/Auxiliary';
 import Burger from '../../components/Burger/Burger';
-import BuildControls from '../../components/Burger/BuildControls/BuildControls'
-import Modal from '../../components/UI/Modal/Modal'
-import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
+import BuildControls from '../../components/Burger/BuildControls/BuildControls';
+import Modal from '../../components/UI/Modal/Modal';
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
+import Spinner from '../../components/UI/Spinner/Spinner';
 
 const INGREDIENT_PRICES = {
     salad: 0.5,
@@ -29,7 +30,8 @@ class BurgerBuilder extends Component {
         },
         totalPrice: 4,
         purchasable: false,
-        purchasing: false
+        purchasing: false,
+        loading: false
     }
 
     updatePurchaseState(ingredients) {
@@ -84,7 +86,26 @@ class BurgerBuilder extends Component {
     }
 
     onPurchaseContinue = () => {
-        alert('You continue!');
+        //alert('You continue!');
+
+        this.setState({loading: true});
+        const order = {
+            ingredients: this.state.ingredients,
+            // cena powinna być ustalana po stronie serwera, żeby nie udało jej się zmanipulować!
+            price: this.state.totalPrice,
+            customer: {
+                name: 'Paweł D.',
+                address: {
+                    street: 'ul. Sezamkowa 1',
+                    zipCode: '00600',
+                    country: 'Poland'
+                },
+                email: 'address@domena.pl'
+            },
+            deliveryMethod: 'DPD'
+        }
+
+        // axios todo - post here!
     }
 
     render() {
@@ -102,12 +123,7 @@ class BurgerBuilder extends Component {
         return (
             <Aux>
                 <Modal show={this.state.purchasing} modalClosed={this.onPurchaseCancel}>
-                <OrderSummary 
-                        ingredients={this.state.ingredients} 
-                        purchaseCancelled={this.onPurchaseCancel} 
-                        purchaseContinued={this.onPurchaseContinue} 
-                        price={this.state.totalPrice}
-                        />
+                    {this.getOrderInformation()}
                 </Modal>
                 <Burger ingredients={this.state.ingredients} />
                 <BuildControls
@@ -120,6 +136,21 @@ class BurgerBuilder extends Component {
                 />
             </Aux>
         );
+    }
+
+    // wyświetla informacje związane z zamówieniem
+    getOrderInformation(){
+        if ( this.state.loading) {
+            return <Spinner />
+        }
+
+        // summary
+        return <OrderSummary 
+            ingredients={this.state.ingredients} 
+            purchaseCancelled={this.onPurchaseCancel} 
+            purchaseContinued={this.onPurchaseContinue} 
+            price={this.state.totalPrice}
+            />        
     }
 }
 
