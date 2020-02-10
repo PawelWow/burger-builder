@@ -96,35 +96,14 @@ class BurgerBuilder extends Component {
     onPurchaseContinue = () => {
         //alert('You continue!');
 
-        this.setState({loading: true});        
-        const order = {
-            ingredients: this.state.ingredients,
-            // cena powinna być ustalana po stronie serwera, żeby nie udało jej się zmanipulować!
-            price: this.state.totalPrice,
-            customer: {
-                name: 'Paweł D.',
-                address: {
-                    street: 'ul. Sezamkowa 1',
-                    zipCode: '00600',
-                    country: 'Poland'
-                },
-                email: 'address@domena.pl'
-            },
-            deliveryMethod: 'DPD'
-        }
+        this.setState({loading: true});             
 
-        // axios todo - post here!
-        // w firebase musimy ustawić reguły dla real time database
-        // axios.post('/orders.json', order).then(response => { 
-        //     this.setState({loading: false, purchasing: false})})
-        //     .catch(error => {
-        //         console.log(error);
-        //         this.setState({loading: false, purchasing: false})
-        // });
-
+        // a price nie musi być encode?
+        const queryParams = this.buildIngredientsQuery() + '&price=' + this.state.totalPrice;
+        
         this.props.history.push({
             pathname: '/checkout',
-            search: '?' + this.buildIngredientsQuery()
+            search: '?' + queryParams
         });
 
     };

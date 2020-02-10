@@ -4,6 +4,7 @@ import {BrowserRouter, Route, Switch } from 'react-router-dom';
 import Layout from './hoc/Layout/Layout';
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder';
 import Checkout from './containers/CheckOut/Checkout';
+import Orders from './containers/Orders/Orders';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Layout>
           <Switch>
             <Route path="/" exact component={BurgerBuilder} />
+            <Route path="/orders" exact component={Orders} />
             <Route path="/checkout" component={Checkout} />
             <Route render={() => <h1>Not found.</h1>} />
           </Switch>          
