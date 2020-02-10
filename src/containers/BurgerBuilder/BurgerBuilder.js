@@ -122,7 +122,10 @@ class BurgerBuilder extends Component {
         //         this.setState({loading: false, purchasing: false})
         // });
 
-        this.props.history.push('/checkout');
+        this.props.history.push({
+            pathname: '/checkout',
+            search: '?' + this.buildIngredientsQuery()
+        });
 
     };
 
@@ -135,6 +138,16 @@ class BurgerBuilder extends Component {
                 {this.getBurgerSection()}
             </Aux>
         );
+    }
+
+    // buduje string zapytania do przesyłania składników zamówienia
+    buildIngredientsQuery(){
+        const queryParams = []
+        for(let i in this.state.ingredients) {
+            queryParams.push(encodeURIComponent(i) + '=' + encodeURIComponent(this.state.ingredients[i]));
+        }
+        
+        return queryParams.join('&');
     }
 
     // wyświetla informacje związane z zamówieniem

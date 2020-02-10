@@ -11,6 +11,11 @@ class Checkout extends Component {
             bacon: 1
         }
     }
+
+    componentDidMount(){
+        this.setState({ingredients: this.searchIngredients()});
+    }
+
     onCheckoutCancelled = () => {
         this.props.history.goBack();
     }
@@ -31,6 +36,17 @@ class Checkout extends Component {
         )
     }
 
+    // earches ingredients in the url
+    searchIngredients() {
+        const query = new URLSearchParams(this.props.location.search);
+        const ingredients = {};
+        for(let param of query.entries()){
+            // ['salad', '1']
+            ingredients[param[0]] = +param[1];
+        }
+
+        return ingredients;
+    }
 
 }
 
