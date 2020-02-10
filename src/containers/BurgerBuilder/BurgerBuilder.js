@@ -96,7 +96,7 @@ class BurgerBuilder extends Component {
     onPurchaseContinue = () => {
         //alert('You continue!');
 
-        this.setState({loading: true});
+        this.setState({loading: true});        
         const order = {
             ingredients: this.state.ingredients,
             // cena powinna być ustalana po stronie serwera, żeby nie udało jej się zmanipulować!
@@ -121,7 +121,9 @@ class BurgerBuilder extends Component {
         //         console.log(error);
         //         this.setState({loading: false, purchasing: false})
         // });
-            
+
+        this.props.history.push('/checkout');
+
     };
 
     render() { 
