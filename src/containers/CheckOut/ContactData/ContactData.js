@@ -1,6 +1,7 @@
 import React, {Component } from 'react';
 
 import Button from '../../../components/UI/Button/Button';
+import Input from '../../../components/UI/Input/Input'
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import axios from '../../../axios-orders';
 
@@ -8,11 +9,60 @@ import classes from './ContactData.css';
 
 class ContactData extends Component {
     state = {
-        name: '',
-        email: '', 
-        address: {
-            street: '',
-            postalCode: ''
+        orderForm: {
+            name: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Your name'
+                },
+                value: ''
+            },
+            street: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Street'
+                },
+                value: ''
+            },
+            zipCode: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'ZIP code'
+                },
+                value: ''
+            },
+            country: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Country'
+                },
+                value: ''
+            },
+            email: {
+                elementType: 'input',
+                elementConfig: {
+                    type: 'text',
+                    placeholder: 'Your E-Mail'
+                },
+                value: ''
+            },
+            deliveryMethod: {
+                elementType: 'select',
+                elementConfig: {
+                    options: [
+                        {value: 'fastest', displayValue: 'Fastest'},
+                        {value: 'cheapest', displayValue: 'Cheapest'}
+                    ]
+                },
+                // TODO tutaj jest bug: nie mamy żadnej wartości początkowej, więc jeśli user nie ruszy selecta i nie wybierze wartości
+                // to wartość "domyślna", czyli tak, która wyświetliła się jako pierwsza - nie zostanie zapisana w bazie.
+                value: ''
+            },                        
+
         },
         loading: false
     }
@@ -26,16 +76,7 @@ class ContactData extends Component {
             ingredients: this.props.ingredients,
             // cena powinna być ustalana po stronie serwera, żeby nie udało jej się zmanipulować!
             price: this.props.price,
-            customer: {
-                name: 'Paweł D.',
-                address: {
-                    street: 'ul. Sezamkowa 1',
-                    zipCode: '00600',
-                    country: 'Poland'
-                },
-                email: 'address@domena.pl'
-            },
-            deliveryMethod: 'DPD'
+            orderData: this.getFormData()
         }
 
                 //w firebase musimy ustawić reguły dla real time database
@@ -47,6 +88,20 @@ class ContactData extends Component {
         });
         
         
+    }
+
+    onInputChanged = (event, inputIdentifier) => {
+        const updatedOrderForm = {
+            ...this.state.orderForm
+        };
+
+        const updatedFormElement = {
+            ...updatedOrderForm[inputIdentifier]
+        };
+
+        updatedFormElement.value = event.target.value;
+        updatedOrderForm[inputIdentifier] = updatedFormElement;
+        this.setState({orderForm: updatedOrderForm});
     }
 
     render(){
@@ -65,15 +120,37 @@ class ContactData extends Component {
             return <Spinner />;
         }
 
-        return (
-            <form>
-                <input className={classes.Input} type="text" name="name" placeholder="Your name" />
-                <input className={classes.Input} type="email" name="name" placeholder="Your email" />
-                <input className={classes.Input} type="text" name="street" placeholder="Street" />
-                <input className={classes.Input} type="text" name="postalCode" placeholder="Your postalCode" />
-                <Button btnType="Success" clicked={this.onOrder}>ORDER</Button>
+        const formElementsArray = [];
+        for(let key in this.state.orderForm) {
+            formElementsArray.push({
+                id: key,
+                config: this.state.orderForm[key]
+            });
+        }
+
+        return (            
+            <form onSubmit={this.onOrder}>
+                {formElementsArray.map(formElement => (
+                    <Input
+                        key={formElement.id}
+                        elementType={formElement.config.elementType}
+                        elementConfig={formElement.config.elementConfig}
+                        value={formElement.config.value}
+                        changed={(event) => this.onInputChanged(event, formElement.id)} 
+                        />
+                ))}             
+                <Button btnType="Success">ORDER</Button>
             </form>
         );
+    }
+
+    getFormData(){
+        const formData = {};
+        for(let formElementIdentifier in this.state.orderForm) {
+            formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
+        }
+
+        return formData;
     }
 }
 
