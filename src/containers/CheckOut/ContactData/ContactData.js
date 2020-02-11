@@ -16,7 +16,12 @@ class ContactData extends Component {
                     type: 'text',
                     placeholder: 'Your name'
                 },
-                value: ''
+                value: '',
+                validation: {
+                    required: true
+                },
+                isValid: false,
+                isTouched: false
             },
             street: {
                 elementType: 'input',
@@ -24,7 +29,12 @@ class ContactData extends Component {
                     type: 'text',
                     placeholder: 'Street'
                 },
-                value: ''
+                value: '',
+                validation: {
+                    required: true
+                },
+                isValid: false,
+                isTouched: false
             },
             zipCode: {
                 elementType: 'input',
@@ -32,7 +42,15 @@ class ContactData extends Component {
                     type: 'text',
                     placeholder: 'ZIP code'
                 },
-                value: ''
+                value: '',
+                validation: {
+                    required: true,
+                    minLength: 5,
+                    maxLength: 5,
+                    isNumeric: true
+                },
+                isValid: false,
+                isTouched: false
             },
             country: {
                 elementType: 'input',
@@ -40,7 +58,12 @@ class ContactData extends Component {
                     type: 'text',
                     placeholder: 'Country'
                 },
-                value: ''
+                value: '',
+                validation: {
+                    required: true
+                },
+                isValid: false,
+                isTouched: false
             },
             email: {
                 elementType: 'input',
@@ -48,7 +71,13 @@ class ContactData extends Component {
                     type: 'text',
                     placeholder: 'Your E-Mail'
                 },
-                value: ''
+                value: '',
+                validation: {
+                    required: true,
+                    isEmail: true
+                },
+                isValid: false,
+                isTouched: false
             },
             deliveryMethod: {
                 elementType: 'select',
@@ -60,10 +89,13 @@ class ContactData extends Component {
                 },
                 // TODO tutaj jest bug: nie mamy żadnej wartości początkowej, więc jeśli user nie ruszy selecta i nie wybierze wartości
                 // to wartość "domyślna", czyli tak, która wyświetliła się jako pierwsza - nie zostanie zapisana w bazie.
-                value: ''
+                value: '',
+                validation: {},
+                valid: true
             },                        
 
         },
+        formIsValid: false,
         loading: false
     }
 
@@ -100,8 +132,44 @@ class ContactData extends Component {
         };
 
         updatedFormElement.value = event.target.value;
+        updatedFormElement.isValid = this.checkIsValid(updatedFormElement.value, updatedFormElement.validation);
+        updatedFormElement.isTouched = true;
         updatedOrderForm[inputIdentifier] = updatedFormElement;
-        this.setState({orderForm: updatedOrderForm});
+
+        this.setState({orderForm: updatedOrderForm, formIsValid: this.checkFormIsValid(updatedOrderForm)});
+    }
+
+    checkIsValid(value, rules){
+        let isValid = true;
+        if (!rules) {
+            // Nie ma reguł, więc zawsze walidny
+            return true;
+        }
+
+        if(rules.required) {
+            isValid = value.trim() !== '' && isValid;
+        }
+
+        if (rules.minLength){
+            isValid = value.length >= rules.minLength && isValid;
+        }
+
+        if(rules.maxLength){
+            isValid = value.length <= rules.maxLength && isValid;
+        }
+
+        if(rules.isEmail){
+            // gotowiec: https://emailregex.com/
+            const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            isValid = pattern.test(value) && isValid;
+        }
+        
+        if(rules.isNumeric) {
+            const pattern = /^\d+$/;
+            isValid = pattern.test(value) && isValid;
+        }
+
+        return isValid;
     }
 
     render(){
@@ -136,10 +204,13 @@ class ContactData extends Component {
                         elementType={formElement.config.elementType}
                         elementConfig={formElement.config.elementConfig}
                         value={formElement.config.value}
+                        invalid={!formElement.config.isValid}
+                        shouldValidate={formElement.config.validation}
+                        isTouched={formElement.config.isTouched}
                         changed={(event) => this.onInputChanged(event, formElement.id)} 
                         />
                 ))}             
-                <Button btnType="Success">ORDER</Button>
+                <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
             </form>
         );
     }
@@ -151,6 +222,22 @@ class ContactData extends Component {
         }
 
         return formData;
+    }
+
+    // Jeśli jaki element formularza nie jest walidny to zwraca false - 
+    checkFormIsValid(form)
+    {
+        
+        for(let inputIdentifier in form){
+            
+            if(form[inputIdentifier].isValid === false)
+            {
+
+                return false;
+            }
+        }
+
+        return true;
     }
 }
 
