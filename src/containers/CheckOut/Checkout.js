@@ -1,19 +1,11 @@
 import React, {Component} from 'react';
 import {Route} from 'react-router-dom';
+import {connect} from 'react-redux';
 
 import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary';
 import ContactData from '../CheckOut/ContactData/ContactData'
 
 class Checkout extends Component {
-    state = {
-        ingredients: null,
-        price: 0
-    }
-
-    componentWillMount() {
-        const paramsData = this.unboxParamsData();
-        this.setState({ingredients: paramsData.ingredients, price: paramsData.price});
-    }
 
     onCheckoutCancelled = () => {
         this.props.history.goBack();
@@ -27,40 +19,21 @@ class Checkout extends Component {
         return (
             <div>
                 <CheckoutSummary 
-                    ingredients={this.state.ingredients} 
+                    ingredients={this.props.ings} 
                     checkoutCancelled={this.onCheckoutCancelled}
                     checkoutContinued={this.onCheckoutContinued}
                     />
                 <Route path={this.props.match.path + '/contact-data'} 
-                render={(props) => (<ContactData ingredients={this.state.ingredients} price={this.state.price} {...props} />)} /> 
+                render={<ContactData />} /> 
             </div>
         )
     }
-
-    // gets data: ingredeitns and price from url
-    unboxParamsData() {
-        let price = 0;
-        const query = new URLSearchParams(this.props.location.search);
-        const ingredients = {};
-        for(let param of query.entries()){
-            // ['salad', '1']
-
-            if(param[0] === 'price')
-            {
-                // TODO - temporary solution!
-                price = param[1];
-            }
-            else
-            {
-                ingredients[param[0]] = +param[1];
-            }            
-        }
-
-
-
-        return {ingredients: ingredients, price: price};
-    }
-
 }
 
-export default Checkout;
+const mapStateToProps = state => {
+    return {
+        ings: state.ingredients
+    }
+};
+
+export default connect(mapStateToProps)(Checkout);
