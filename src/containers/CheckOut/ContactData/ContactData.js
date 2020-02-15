@@ -7,7 +7,6 @@ import Spinner from '../../../components/UI/Spinner/Spinner';
 import axios from '../../../axios-orders';
 
 import classes from './ContactData.css';
-import { stat } from 'fs-extra';
 
 class ContactData extends Component {
     state = {
