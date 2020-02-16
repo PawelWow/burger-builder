@@ -5,6 +5,8 @@ import Button from '../../../components/UI/Button/Button';
 import Input from '../../../components/UI/Input/Input'
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import axios from '../../../axios-orders';
+import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
+import * as actions from '../../../store/actions/index';
 
 import classes from './ContactData.css';
 
@@ -88,9 +90,8 @@ class ContactData extends Component {
                         {value: 'cheapest', displayValue: 'Cheapest'}
                     ]
                 },
-                // TODO tutaj jest bug: nie mamy żadnej wartości początkowej, więc jeśli user nie ruszy selecta i nie wybierze wartości
-                // to wartość "domyślna", czyli tak, która wyświetliła się jako pierwsza - nie zostanie zapisana w bazie.
-                value: '',
+                // dajemy wartość domyślną dla switcha, bo bez tego nie będzie żadnej wartości w bazie
+                value: 'fastest',
                 validation: {},
                 valid: true
             },                        
@@ -103,7 +104,6 @@ class ContactData extends Component {
     onOrder= (event) =>
     {
         event.preventDefault();
-        this.setState({loading: true});
 
         const order = {
             ingredients: this.props.ings,
@@ -112,15 +112,7 @@ class ContactData extends Component {
             orderData: this.getFormData()
         }
 
-                //w firebase musimy ustawić reguły dla real time database
-        axios.post('/orders.json', order).then(response => { 
-            this.setState({loading: false, purchasing: false})})
-            .catch(error => {
-                console.log(error);
-                this.setState({loading: false, purchasing: false})
-        });
-        
-        
+        this.props.onOrderBurger(order);
     }
 
     onInputChanged = (event, inputIdentifier) => {
@@ -244,9 +236,15 @@ class ContactData extends Component {
 
 const mapStateToProps = state => {
     return {
-        ings: state.ingredients,
-        price: state.totalPrice
+        ings: state.burgerBuilder.ingredients,
+        price: state.order.totalPrice
     }
 }
 
-export default connect(mapStateToProps)(ContactData);
+const mapDispatchToProps = dispatch => {
+    return {
+        onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios));
