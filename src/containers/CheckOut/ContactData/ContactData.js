@@ -97,8 +97,7 @@ class ContactData extends Component {
             },                        
 
         },
-        formIsValid: false,
-        loading: false
+        formIsValid: false
     }
 
     onOrder= (event) =>
@@ -112,7 +111,7 @@ class ContactData extends Component {
             orderData: this.getFormData()
         }
 
-        this.props.onOrderBurger(order);
+        this.props.onOrderBurger(order, this.props.token);
     }
 
     onInputChanged = (event, inputIdentifier) => {
@@ -177,7 +176,7 @@ class ContactData extends Component {
     // w zależności od stanu ładowania pokazuje formularz lub spinner
     showForm()
     {
-        if(this.state.loading){
+        if(this.props.loading){
             return <Spinner />;
         }
 
@@ -237,13 +236,15 @@ class ContactData extends Component {
 const mapStateToProps = state => {
     return {
         ings: state.burgerBuilder.ingredients,
-        price: state.order.totalPrice
+        price: state.burgerBuilder.totalPrice,
+        loading: state.order.loading,
+        token: state.auth.token,
     }
 }
 
 const mapDispatchToProps = dispatch => {
     return {
-        onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData))
+        onOrderBurger: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
     };
 };
 
