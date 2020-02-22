@@ -15,8 +15,7 @@ const input = (props) => {
     }
 
     const inputClasses = getInputClasses(props);
-    console.log(inputClasses);
-
+    
     let inputElement = null;
     switch (props.elementType) {
         default:
