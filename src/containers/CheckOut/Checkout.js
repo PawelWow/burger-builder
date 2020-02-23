@@ -27,8 +27,11 @@ class Checkout extends Component {
     showSummary()
     {
         if(!this.props.ings || this.props.purchased){
+            console.log('checkout redirect to root');
             return <Redirect to="/" />
         }
+
+        console.log('ingredients: ' + this.props.ings);
 
         return ( 
             <Aux>

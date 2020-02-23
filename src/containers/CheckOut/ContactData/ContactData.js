@@ -108,7 +108,8 @@ class ContactData extends Component {
             ingredients: this.props.ings,
             // cena powinna być ustalana po stronie serwera, żeby nie udało jej się zmanipulować!
             price: this.props.price,
-            orderData: this.getFormData()
+            orderData: this.getFormData(),
+            userId: this.props.userId
         }
 
         this.props.onOrderBurger(order, this.props.token);
@@ -239,6 +240,7 @@ const mapStateToProps = state => {
         price: state.burgerBuilder.totalPrice,
         loading: state.order.loading,
         token: state.auth.token,
+        userId: state.auth.userId
     }
 }
 

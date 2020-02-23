@@ -65,10 +65,14 @@ export const fetchOrdersStart = () => {
     };
 };
 
-export const fetchOrders = (token) => {
+export const fetchOrders = (token, userId) => {
     return dispatch => {
         dispatch(fetchOrdersStart());
-        axios.get(getAuthOrderUrl(token))
+
+        // filtrujemy zamówienia od danego usera tylko
+        const ordersUrl = getAuthOrderUrl(token) + '&orderBy="userId"&equalTo="' + userId + '"';
+
+        axios.get(ordersUrl)
             .then(res => {
                 const fetchedOrders = [];
                 for(let key in res.data) {
@@ -82,7 +86,6 @@ export const fetchOrders = (token) => {
     };
 };
 
-const getAuthOrderUrl = (token) => {
-    console.log('token - ' + token);
+const getAuthOrderUrl = (token) => {    
     return ORDERS_URL + '?auth=' + token;
 }
