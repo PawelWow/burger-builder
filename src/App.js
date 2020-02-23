@@ -28,9 +28,12 @@ class App extends Component {
 
   getRoutes(){
     if( this.props.isAuthenticated ) {     
-      console.log('auth');
+      
+      // Dodałem /auth i teraz działa - widocznie skaszaniło się, bo w kursie podział na ścieżki dla auth/unauth nastąpił, ale
+      // w kursie jeszcze nie sprawdzono czy wszystko działa. Tak czy siak, cały dzień w pizdu
       return(
         <Switch>                       
+          <Route path="/auth" component={Auth} /> 
           <Route path="/checkout" component={Checkout} />
           <Route path="/orders" exact component={Orders} />          
           <Route path="/logout" component={Logout} />
@@ -39,9 +42,8 @@ class App extends Component {
         </Switch>
       );
     }
-    console.log('unauth');
+    
     return(
-
       <Switch>   
         <Route path="/auth" component={Auth} /> 
         <Route path="/" exact component={BurgerBuilder} />

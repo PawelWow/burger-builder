@@ -111,12 +111,9 @@ class Auth extends Component {
     }
 
     render() {
-        if( this.props.isAuthenticated ) {
-            console.log('redirecting to: ' + this.props.authRedirectPath);
+        if( this.props.isAuthenticated ) {            
             return <Redirect to={this.props.authRedirectPath} />;            
         }
-
-        console.log('no redirections');
 
         return (
             <div className={classes.Auth}>
