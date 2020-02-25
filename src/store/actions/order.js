@@ -30,7 +30,6 @@ export const purchaseBurger = (orderData, token) => {
         //w firebase musimy ustawić reguły dla real time database
         axios.post(getAuthOrderUrl(token), orderData)
             .then(response => { 
-                console.log(response.data);
                 dispatch( purchaseBurgerSuccess( response.data.name, orderData ));
             } )            
             .catch(error => {

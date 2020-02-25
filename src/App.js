@@ -4,11 +4,23 @@ import { connect } from 'react-redux';
 
 import Layout from './hoc/Layout/Layout';
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder';
-import Checkout from './containers/CheckOut/Checkout';
-import Orders from './containers/Orders/Orders';
-import Auth from './containers/Auth/Auth';
 import Logout from './containers/Auth/Logout/Logout';
 import * as actions from './store/actions/index';
+import asyncComponent from './hoc/asyncComponent/asyncComponent';
+
+// async - tutaj ładujemy dopiero, kiedy potrzebne - używać, jeśli coś jest rzadko używane lub raz na jakiś czas
+
+const asyncCheckout = asyncComponent(() => {
+  return import('./containers/CheckOut/Checkout');
+});
+
+const asyncOrders = asyncComponent(() => {
+ return import('./containers/Orders/Orders');
+});
+
+const asyncAuth = asyncComponent(() => {
+  return import('./containers/Auth/Auth');
+});
 
 class App extends Component {
   componentDidMount() {
@@ -33,9 +45,9 @@ class App extends Component {
       // w kursie jeszcze nie sprawdzono czy wszystko działa. Tak czy siak, cały dzień w pizdu
       return(
         <Switch>                       
-          <Route path="/auth" component={Auth} /> 
-          <Route path="/checkout" component={Checkout} />
-          <Route path="/orders" exact component={Orders} />          
+          <Route path="/auth" component={asyncAuth} /> 
+          <Route path="/checkout" component={asyncCheckout} />
+          <Route path="/orders" exact component={asyncOrders} />          
           <Route path="/logout" component={Logout} />
           <Route path="/" exact component={BurgerBuilder} /> 
           <Redirect to="/" />   
@@ -45,7 +57,7 @@ class App extends Component {
     
     return(
       <Switch>   
-        <Route path="/auth" component={Auth} /> 
+        <Route path="/auth" component={asyncAuth} /> 
         <Route path="/" exact component={BurgerBuilder} />
         <Redirect to="/" />       
       </Switch>

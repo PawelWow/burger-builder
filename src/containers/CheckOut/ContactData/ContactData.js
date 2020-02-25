@@ -7,6 +7,7 @@ import Spinner from '../../../components/UI/Spinner/Spinner';
 import axios from '../../../axios-orders';
 import withErrorHandler from '../../../hoc/withErrorHandler/withErrorHandler';
 import * as actions from '../../../store/actions/index';
+import {updateObject, checkIsValid} from '../../../shared/utility';
 
 import classes from './ContactData.css';
 
@@ -116,53 +117,19 @@ class ContactData extends Component {
     }
 
     onInputChanged = (event, inputIdentifier) => {
-        const updatedOrderForm = {
-            ...this.state.orderForm
-        };
 
-        const updatedFormElement = {
-            ...updatedOrderForm[inputIdentifier]
-        };
 
-        updatedFormElement.value = event.target.value;
-        updatedFormElement.isValid = this.checkIsValid(updatedFormElement.value, updatedFormElement.validation);
-        updatedFormElement.isTouched = true;
-        updatedOrderForm[inputIdentifier] = updatedFormElement;
+        const updatedFormElement = updateObject(this.state.orderForm[inputIdentifier], {
+            value: event.target.value,
+            isValid: checkIsValid(event.target.value, this.state.orderForm[inputIdentifier].validation),
+            isTouched: true
+        });
 
+        const updatedOrderForm = updateObject(this.state.orderForm, {
+            [inputIdentifier]: updatedFormElement
+        });
+       
         this.setState({orderForm: updatedOrderForm, formIsValid: this.checkFormIsValid(updatedOrderForm)});
-    }
-
-    checkIsValid(value, rules){
-        let isValid = true;
-        if (!rules) {
-            // Nie ma reguł, więc zawsze walidny
-            return true;
-        }
-
-        if(rules.required) {
-            isValid = value.trim() !== '' && isValid;
-        }
-
-        if (rules.minLength){
-            isValid = value.length >= rules.minLength && isValid;
-        }
-
-        if(rules.maxLength){
-            isValid = value.length <= rules.maxLength && isValid;
-        }
-
-        if(rules.isEmail){
-            // gotowiec: https://emailregex.com/
-            const pattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-            isValid = pattern.test(value) && isValid;
-        }
-        
-        if(rules.isNumeric) {
-            const pattern = /^\d+$/;
-            isValid = pattern.test(value) && isValid;
-        }
-
-        return isValid;
     }
 
     render(){
