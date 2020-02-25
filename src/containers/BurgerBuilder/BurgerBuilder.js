@@ -13,7 +13,8 @@ import axios from '../../axios-orders';
 
 import * as actions from '../../store/actions/index';
 
-class BurgerBuilder extends Component {
+// export class na potrzeby testów -dzięki temu możemy zrobić import { BurgerBuilder }...
+export class BurgerBuilder extends Component {
     // Tak można też state inicjalizować
     // constructor(props) {
     //     super(props);
