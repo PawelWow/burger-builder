@@ -1,7 +1,4 @@
 import * as actionTypes from './actionTypes';
-import axios from '../../axios-orders';
-
-const ORDERS_URL = '/orders.json'; 
 
 export const purchaseBurgerSuccess = (id, orderData) => {
     return {
@@ -25,17 +22,11 @@ export const purchaseBurgerStart = () => {
 };
 
 export const purchaseBurger = (orderData, token) => {
-    return dispatch => {
-        dispatch( purchaseBurgerStart() );
-        //w firebase musimy ustawić reguły dla real time database
-        axios.post(getAuthOrderUrl(token), orderData)
-            .then(response => { 
-                dispatch( purchaseBurgerSuccess( response.data.name, orderData ));
-            } )            
-            .catch(error => {
-                dispatch( purchaseBurgerFail( error ));
-        });
-    };
+    return {
+        type: actionTypes.PURCHASE_BURGER_PROCEED,
+        token: token,
+        orderData: orderData
+    }
 };
 
 export const purchaseInit = () => {
@@ -65,26 +56,9 @@ export const fetchOrdersStart = () => {
 };
 
 export const fetchOrders = (token, userId) => {
-    return dispatch => {
-        dispatch(fetchOrdersStart());
-
-        // filtrujemy zamówienia od danego usera tylko
-        const ordersUrl = getAuthOrderUrl(token) + '&orderBy="userId"&equalTo="' + userId + '"';
-
-        axios.get(ordersUrl)
-            .then(res => {
-                const fetchedOrders = [];
-                for(let key in res.data) {
-                    fetchedOrders.push( {...res.data[key], id: key});
-                }
-                dispatch(fetchOrdersSuccess(fetchedOrders));
-            })
-            .catch(error => {
-                dispatch(fetchOrdersFail(error));
-            });
-    };
+    return {
+        type: actionTypes.FETCH_ORDERS_PROCEED,
+        token: token,
+        userId: userId
+    }
 };
-
-const getAuthOrderUrl = (token) => {    
-    return ORDERS_URL + '?auth=' + token;
-}
