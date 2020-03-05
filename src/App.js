@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import {Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -22,24 +22,21 @@ const asyncAuth = asyncComponent(() => {
   return import('./containers/Auth/Auth');
 });
 
-class App extends Component {
-  componentDidMount() {
-    this.props.onTryAutoSignup();
-  }
+const App = props => {
+  useEffect(() => {
+    props.onTryAutoSignup();
+  }, []);
 
-  render() {
+  return (
+    <div>
+      <Layout>
+        {getRoutes(props)}       
+      </Layout>
+    </div>       
+  );
 
-    return (
-      <div>
-        <Layout>
-          {this.getRoutes()}       
-        </Layout>
-      </div>       
-    );
-  }
-
-  getRoutes(){
-    if( this.props.isAuthenticated ) {     
+  function getRoutes(props) {
+    if( props.isAuthenticated ) {     
       
       // Dodałem /auth i teraz działa - widocznie skaszaniło się, bo w kursie podział na ścieżki dla auth/unauth nastąpił, ale
       // w kursie jeszcze nie sprawdzono czy wszystko działa. Tak czy siak, cały dzień w pizdu
