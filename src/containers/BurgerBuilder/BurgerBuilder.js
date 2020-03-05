@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 
 import Aux from '../../hoc/Auxiliary/Auxiliary';
@@ -14,26 +14,18 @@ import axios from '../../axios-orders';
 import * as actions from '../../store/actions/index';
 
 // export class na potrzeby testów -dzięki temu możemy zrobić import { BurgerBuilder }...
-export class BurgerBuilder extends Component {
-    // Tak można też state inicjalizować
-    // constructor(props) {
-    //     super(props);
-    //     this.state = {...}
-    // }
+export const BurgerBuilder = props => {
+    const [purchasing, setPurchasing] = useState(false);
+
+    useEffect(() =>{
+        props.onInitIngredients();
+    }, []);
 
     // ścieżki
-    IDS_CHECKOUT = '/checkout';
-    IDS_AUTH = '/auth';
+    const IDS_CHECKOUT = '/checkout';
+    const IDS_AUTH = '/auth';
 
-    state = {
-        purchasing: false
-    }
-
-    componentDidMount(){    
-        this.props.onInitIngredients();
-    }
-
-    updatePurchaseState(ingredients) {
+    const updatePurchaseState = (ingredients) => {
         const sum = Object.keys(ingredients).map(igKey => {
             return ingredients[igKey];
         })
@@ -43,60 +35,58 @@ export class BurgerBuilder extends Component {
         return sum > 0;
     }
 
-    onPurchase = () => {
-        if(this.props.isAuthenticated) {
-            this.setState({purchasing: true});
+    const onPurchase = () => {
+        if(props.isAuthenticated) {
+            setPurchasing(true);
         }
         else {
-            this.props.onSetAuthRedirectPath(this.IDS_CHECKOUT);
-            this.props.history.push(this.IDS_AUTH);
+            props.onSetAuthRedirectPath(IDS_CHECKOUT);
+            props.history.push(IDS_AUTH);
         }
         
     }
 
-    onPurchaseCancel = () => {
-        this.setState({purchasing: false});
+    const onPurchaseCancel = () => {
+        setPurchasing(false);        
     }
 
-    onPurchaseContinue = () => {
-        this.props.onInitPurchase();
-        this.props.history.push(this.IDS_CHECKOUT);
+    const onPurchaseContinue = () => {
+        props.onInitPurchase();
+        props.history.push(IDS_CHECKOUT);
     };
 
-    render() { 
-        return (
-            <Aux>
-                <Modal show={this.state.purchasing} modalClosed={this.onPurchaseCancel}>
-                    {this.getOrderInformation()}
-                </Modal>
-                {this.getBurgerSection()}
-            </Aux>
-        );
-    }
+    return (
+        <Aux>
+            <Modal show={purchasing} modalClosed={onPurchaseCancel}>
+                {getOrderInformation(props)}
+            </Modal>
+            {getBurgerSection(props)}
+        </Aux>
+    );
 
     // wyświetla informacje związane z zamówieniem
-    getOrderInformation(){
-        if(!this.props.ings){
+    function getOrderInformation(props){
+        if(!props.ings){
             // nie ma składników - nie ma podsumowania.
             return null;
         }
 
         // summary
         return <OrderSummary 
-            ingredients={this.props.ings} 
-            purchaseCancelled={this.onPurchaseCancel} 
-            purchaseContinued={this.onPurchaseContinue} 
-            price={this.props.price}
+            ingredients={props.ings} 
+            purchaseCancelled={onPurchaseCancel} 
+            purchaseContinued={onPurchaseContinue} 
+            price={props.price}
             />        
     }
 
     // wyświetla sekcję z burgerem
-    getBurgerSection(){
-        if(this.props.error){
+    function getBurgerSection(props){
+        if(props.error){
             return <p>Ingredients could'n be loaded!</p>
         }
 
-        if(!this.props.ings){
+        if(!props.ings){
             // jeszcze nie mamy             
             return <Spinner />
         }
@@ -105,7 +95,7 @@ export class BurgerBuilder extends Component {
 
         // to jest masakra: miałem liczby...
         const disabledInfo = {
-            ...this.props.ings
+            ...props.ings
         };
 
         // ...będę miał booleany
@@ -115,15 +105,15 @@ export class BurgerBuilder extends Component {
 
         return (
             <Aux>
-                <Burger ingredients={this.props.ings} />
+                <Burger ingredients={props.ings} />
                 <BuildControls
-                    ingredientAdded={this.props.onIngredientAdded}
-                    ingredientRemoved={this.props.onIngredientRemoved}
+                    ingredientAdded={props.onIngredientAdded}
+                    ingredientRemoved={props.onIngredientRemoved}
                     disabled={disabledInfo}
-                    purchasable={this.updatePurchaseState(this.props.ings)}
-                    ordered={this.onPurchase}
-                    price={this.props.price}
-                    isAuth={this.props.isAuthenticated}
+                    purchasable={updatePurchaseState(props.ings)}
+                    ordered={onPurchase}
+                    price={props.price}
+                    isAuth={props.isAuthenticated}
                 />
             </Aux>
         );
