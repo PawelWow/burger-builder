@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import {Redirect, Route, Switch, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -6,19 +6,18 @@ import Layout from './hoc/Layout/Layout';
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder';
 import Logout from './containers/Auth/Logout/Logout';
 import * as actions from './store/actions/index';
-import asyncComponent from './hoc/asyncComponent/asyncComponent';
 
-// async - tutaj ładujemy dopiero, kiedy potrzebne - używać, jeśli coś jest rzadko używane lub raz na jakiś czas
+// async albo lazy - tutaj ładujemy dopiero, kiedy potrzebne - używać, jeśli coś jest rzadko używane lub raz na jakiś czas
 
-const asyncCheckout = asyncComponent(() => {
+const Checkout = React.lazy(() => {
   return import('./containers/CheckOut/Checkout');
 });
 
-const asyncOrders = asyncComponent(() => {
+const Orders = React.lazy(() => {
  return import('./containers/Orders/Orders');
 });
 
-const asyncAuth = asyncComponent(() => {
+const Auth = React.lazy(() => {
   return import('./containers/Auth/Auth');
 });
 
@@ -30,7 +29,7 @@ const App = props => {
   return (
     <div>
       <Layout>
-        {getRoutes(props)}       
+        <Suspense fallback={<p>Loading...</p>}>{getRoutes(props)}</Suspense>
       </Layout>
     </div>       
   );
@@ -42,9 +41,9 @@ const App = props => {
       // w kursie jeszcze nie sprawdzono czy wszystko działa. Tak czy siak, cały dzień w pizdu
       return(
         <Switch>                       
-          <Route path="/auth" component={asyncAuth} /> 
-          <Route path="/checkout" component={asyncCheckout} />
-          <Route path="/orders" exact component={asyncOrders} />          
+          <Route path="/auth" render={() => <Auth />} /> 
+          <Route path="/checkout" render={() => <Checkout /> } />
+          <Route path="/orders" exact render={() => <Orders /> } />          
           <Route path="/logout" component={Logout} />
           <Route path="/" exact component={BurgerBuilder} /> 
           <Redirect to="/" />   
@@ -54,7 +53,7 @@ const App = props => {
     
     return(
       <Switch>   
-        <Route path="/auth" component={asyncAuth} /> 
+        <Route path="/auth" render={() => <Auth />} /> 
         <Route path="/" exact component={BurgerBuilder} />
         <Redirect to="/" />       
       </Switch>
