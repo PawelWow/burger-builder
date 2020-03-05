@@ -41,9 +41,9 @@ const App = props => {
       // w kursie jeszcze nie sprawdzono czy wszystko działa. Tak czy siak, cały dzień w pizdu
       return(
         <Switch>                       
-          <Route path="/auth" render={() => <Auth />} /> 
-          <Route path="/checkout" render={() => <Checkout /> } />
-          <Route path="/orders" exact render={() => <Orders /> } />          
+          <Route path="/auth" render={(props) => <Auth {...props} />} /> 
+          <Route path="/checkout" render={(props) => <Checkout {...props} /> } />
+          <Route path="/orders" exact render={(props) => <Orders {...props} /> } />          
           <Route path="/logout" component={Logout} />
           <Route path="/" exact component={BurgerBuilder} /> 
           <Redirect to="/" />   
@@ -53,7 +53,7 @@ const App = props => {
     
     return(
       <Switch>   
-        <Route path="/auth" render={() => <Auth />} /> 
+        <Route path="/auth" render={(props) => <Auth {...props} />} /> 
         <Route path="/" exact component={BurgerBuilder} />
         <Redirect to="/" />       
       </Switch>

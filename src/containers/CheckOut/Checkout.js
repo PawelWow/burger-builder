@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {Route, Redirect} from 'react-router-dom';
 import {connect} from 'react-redux';
 
@@ -6,39 +6,37 @@ import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSumm
 import ContactData from '../CheckOut/ContactData/ContactData'
 import Aux from '../../hoc/Auxiliary/Auxiliary';
 
-class Checkout extends Component {
+const Checkout = props => {
 
-    onCheckoutCancelled = () => {
-        this.props.history.goBack();
+    const onCheckoutCancelled = () => {
+        props.history.goBack();
     }
 
-    onCheckoutContinued = () => {
-        this.props.history.replace('/checkout/contact-data');
+    const onCheckoutContinued = () => {
+        props.history.replace('/checkout/contact-data');
     }
 
-    render() {
-        return (
-            <Aux>
-                {this.showSummary()}
-            </Aux>
-        )
-    }
+    return (
+        <Aux>
+            {showSummary(props)}
+        </Aux>
+    );
 
-    showSummary()
+    function showSummary(props)
     {
-        if(!this.props.ings || this.props.purchased){
+        if(!props.ings || props.purchased){
             return <Redirect to="/" />
         }
 
         return ( 
             <Aux>
                 <CheckoutSummary 
-                    ingredients={this.props.ings} 
-                    checkoutCancelled={this.onCheckoutCancelled}
-                    checkoutContinued={this.onCheckoutContinued}
+                    ingredients={props.ings} 
+                    checkoutCancelled={onCheckoutCancelled}
+                    checkoutContinued={onCheckoutContinued}
                 />
                 <Route 
-                    path={this.props.match.path + '/contact-data'} 
+                    path={props.match.path + '/contact-data'} 
                     component={ContactData} 
                 /> 
             </Aux>      
